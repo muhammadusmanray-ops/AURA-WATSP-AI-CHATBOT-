@@ -1,19 +1,6 @@
 {
   "version": 2,
   "rewrites": [
-    {
-      "source": "/api/whatsapp/webhook",
-      "destination": "/api/webhook"
-    }
-  ],
-  "builds": [
-    {
-      "src": "api/webhook.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build"
-    }
+    { "source": "/api/webhook", "destination": "/api/webhook.ts" }
   ]
 }
