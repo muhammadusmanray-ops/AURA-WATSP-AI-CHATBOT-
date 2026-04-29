@@ -232,10 +232,27 @@ export default function App() {
            </div>
 
            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar min-h-[300px]">
-              {transcriptions.length === 0 && (
+              {transcriptions.length === 0 && !isConnected && (
                 <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 italic text-center">
                    <div className="w-16 h-16 rounded-full border-2 border-dashed border-orange-500/50 animate-spin-slow mb-6 mx-auto"></div>
                    <p className="text-xs tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Connection</p>
+                </div>
+              )}
+
+              {/* Voice Pulse Visualizer */}
+              {isConnected && (
+                <div className="flex items-center justify-center gap-1.5 h-32 mb-10">
+                  {[...Array(20)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      animate={{ 
+                        height: isConnected ? `${Math.max(4, micVolume * 400 * (1 - Math.abs(i - 10) / 10))}px` : '4px',
+                        opacity: isConnected ? 0.8 : 0.2
+                      }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                      className="w-1.5 bg-orange-500 rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]"
+                    />
+                  ))}
                 </div>
               )}
               <AnimatePresence initial={false}>
