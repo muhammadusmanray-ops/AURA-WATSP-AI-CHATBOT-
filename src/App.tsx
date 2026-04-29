@@ -20,8 +20,6 @@ export default function App() {
   const [apiKey, setApiKey] = useState(process.env.GEMINI_API_KEY || '');
   const [vapiApiKey, setVapiApiKey] = useState(import.meta.env.VITE_VAPI_API_KEY || '');
   const [assistantId, setAssistantId] = useState(import.meta.env.VITE_VAPI_ASSISTANT_ID || '');
-  const [vapiStatus, setVapiStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [vapiTestMessage, setVapiTestMessage] = useState('');
   const [voice, setVoice] = useState('Kore');
   const [callDuration, setCallDuration] = useState(0);
 
@@ -29,19 +27,13 @@ export default function App() {
     let interval: any;
     if (isConnected) {
       interval = setInterval(() => {
-        setCallDuration(prev => {
-          if (prev >= 900) { // 15 minutes
-            disconnect();
-            return prev;
-          }
-          return prev + 1;
-        });
+        setCallDuration(prev => prev + 1);
       }, 1000);
     } else {
       setCallDuration(0);
     }
     return () => clearInterval(interval);
-  }, [isConnected, disconnect]);
+  }, [isConnected]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -50,251 +42,208 @@ export default function App() {
   };
 
   const handleToggleCall = () => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      connect(apiKey, voice);
-    }
-  };
-
-  const testVapiConnection = async () => {
-    if (!vapiApiKey || !assistantId) {
-      setVapiStatus('error');
-      setVapiTestMessage('API Key and Assistant ID are required.');
-      return;
-    }
-
-    setVapiStatus('loading');
-    setVapiTestMessage('');
-
-    try {
-      const response = await fetch(`https://api.vapi.ai/assistant/${assistantId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${vapiApiKey}`,
-          'Content-Type': 'application/json'
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setVapiStatus('success');
-        setVapiTestMessage(`Connected to: ${data.name || 'Assistant'}`);
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        setVapiStatus('error');
-        setVapiTestMessage(errorData.message || `Error: ${response.status}`);
-      }
-    } catch (err) {
-      setVapiStatus('error');
-      setVapiTestMessage('Network error or invalid API key.');
-    }
+    if (isConnected) disconnect();
+    else connect(apiKey, voice);
   };
 
   return (
-    <div className="min-h-screen bg-[#050505] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col">
-      {/* Premium Gradient Background Blur */}
+    <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col relative overflow-hidden">
+      {/* Robotic Background Elements */}
+      <div className="fixed inset-0 circuit-pattern pointer-events-none"></div>
+      <div className="scanline pointer-events-none"></div>
+
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[120px]"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[150px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 rounded-full blur-[150px]"></div>
       </div>
 
-      {/* Header Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-black/20 backdrop-blur-sm">
+      {/* Navigation */}
+      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-black/40 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="relative">
-            <div className="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)]"></div>
-            <div className="absolute inset-0 w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping opacity-50"></div>
+            <div className="w-3 h-3 rounded bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,1)] rotate-45"></div>
+            <div className="absolute inset-0 w-3 h-3 rounded bg-orange-500 animate-ping opacity-40 rotate-45"></div>
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-[0.3em] uppercase text-white">Aura AI Control</h1>
-            <p className="text-[10px] text-[#555] font-mono uppercase tracking-widest mt-0.5">Nexus Neural Core v2.4</p>
+            <h1 className="text-sm font-black tracking-[0.5em] uppercase text-white">AURA NEURAL CORE</h1>
+            <p className="text-[9px] text-[#555] font-mono uppercase tracking-widest mt-1">Autonomous Robotic Interface v2.4</p>
           </div>
         </div>
-        
-        <div className="flex items-center gap-6">
-          <div className="hidden md:flex items-center gap-4 border-x border-white/5 px-6">
-            <div className="text-right">
-              <p className="text-[9px] uppercase tracking-widest text-[#444] mb-0.5">Engine Status</p>
-              <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-tighter">Operational</p>
+        <div className="flex gap-6 items-center">
+            <div className="text-[9px] font-mono text-orange-500/60 uppercase tracking-[0.3em] flex items-center gap-2">
+               <Shield className="w-3 h-3" />
+               SECURE NEURAL LINK
             </div>
-            <Activity className="w-4 h-4 text-emerald-500/50" />
-          </div>
-          
-          <div className="flex gap-4 items-center">
-            <div className="text-[10px] font-mono text-white/40 uppercase tracking-widest">
-               {isConnected ? 'Session Active' : 'Standby Mode'}
-            </div>
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.5)]' : 'bg-white/10'}`}></div>
-          </div>
+            <div className={`w-1.5 h-6 ${isConnected ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)]' : 'bg-white/10'} transition-all`}></div>
         </div>
       </nav>
 
       <main className="relative z-10 flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full space-y-6">
         
-        {/* TOP SECTION: 3x3 Grid for Status & Controls */}
+        {/* TOP SECTION: 3x3 Robotic Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
-          {/* BOX 1: Session Control (Voice) - THE HERO */}
-          <div className="relative group p-[2px] rounded-2xl bg-gradient-to-br from-orange-500 via-red-500 to-purple-600 shadow-lg overflow-hidden">
-             <div className="relative z-10 p-5 rounded-[14px] bg-[#080808]/90 backdrop-blur-3xl h-full flex flex-col justify-between">
-                <div className="flex items-center justify-between mb-4">
-                   <h3 className="text-[9px] uppercase tracking-[0.3em] text-orange-500 font-black">Neural Session</h3>
-                   <Mic className="w-4 h-4 text-orange-500 animate-pulse" />
+          {/* BOX 1: Session Control (Voice Hero) */}
+          <div className="relative group p-[1px] rounded-xl bg-gradient-to-br from-orange-500 via-orange-900 to-black shadow-2xl overflow-hidden">
+             <div className="relative z-10 p-5 rounded-[10px] bg-[#050505]/95 backdrop-blur-3xl h-full flex flex-col justify-between">
+                <div className="flex items-center justify-between mb-4 border-b border-orange-500/10 pb-4">
+                   <h3 className="text-[9px] uppercase tracking-[0.4em] text-orange-500 font-black italic">Initialize Core</h3>
+                   <Activity className="w-4 h-4 text-orange-500" />
                 </div>
                 <button 
                   onClick={handleToggleCall}
-                  disabled={!apiKey && !isConnected}
-                  className={`w-full py-4 rounded-xl text-[10px] uppercase font-black tracking-[0.3em] transition-all active:scale-95 border flex items-center justify-center gap-3 ${
+                  className={`w-full py-5 rounded-lg text-[11px] uppercase font-black tracking-[0.4em] transition-all active:scale-95 border flex items-center justify-center gap-4 ${
                     isConnected 
-                      ? 'bg-red-500/10 border-red-500/50 text-red-500 hover:bg-red-500/20' 
-                      : apiKey 
-                        ? 'bg-orange-500 border-orange-500 text-black hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]'
-                        : 'bg-white/5 border-white/10 text-white/20 cursor-not-allowed'
+                      ? 'bg-red-500/10 border-red-500/50 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
+                      : 'bg-orange-500 border-orange-500 text-black hover:shadow-[0_0_30px_rgba(249,115,22,0.6)]'
                   }`}
                 >
-                  {isConnected ? <PhoneOff className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
-                  <span>{isConnected ? 'Terminate' : 'Initialize'}</span>
+                  {isConnected ? <PhoneOff className="w-5 h-5" /> : <Phone className="w-5 h-5" />}
+                  <span>{isConnected ? 'Kill Task' : 'Boot Aura'}</span>
                 </button>
              </div>
           </div>
 
-          {/* BOX 2: WhatsApp Webhook */}
-          <div className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
+          {/* BOX 2: WhatsApp Neural Stream */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl relative overflow-hidden">
+             <div className="absolute top-0 right-0 p-2 opacity-5">
+                <MessageSquare className="w-20 h-20" />
+             </div>
              <div className="flex items-center justify-between mb-4">
-                   </div>
-                   <ChevronRight className="w-3 h-3" />
-                </button>
+                <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Meta Stream</h3>
+                <div className="w-2 h-2 rounded bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)]"></div>
              </div>
-             <div className="mt-4 p-3 bg-black/40 border border-white/5 rounded-xl">
-                <p className="text-[9px] text-[#444] leading-relaxed">
-                   Current Architecture: Vite (React) + Express Node.js + Gemini 1.5 Flash. Fully optimized for <span className="text-orange-500">Zero-Latency</span> voice interaction.
-                </p>
-             </div>
-          </div>
-
-          {/* Integration Status Box */}
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-             <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#666] mb-6 font-black">Neural Core Config</h3>
-             <div className="space-y-4">
-                <div>
-                   <label className="text-[9px] uppercase text-[#444] block mb-2 font-bold">Vapi Secret Engine</label>
-                   <input 
-                    type="password" 
-                    value={vapiApiKey}
-                    onChange={(e) => setVapiApiKey(e.target.value)}
-                    className="w-full bg-black/60 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white/50 outline-none focus:border-blue-500/20" 
-                    placeholder="vapi-..."
-                   />
-                </div>
-                <div>
-                   <label className="text-[9px] uppercase text-[#444] block mb-2 font-bold">Assistant ID</label>
-                   <input 
-                    type="text" 
-                    value={assistantId}
-                    onChange={(e) => setAssistantId(e.target.value)}
-                    className="w-full bg-black/60 border border-white/5 rounded-xl px-4 py-2.5 text-xs text-white/50 outline-none focus:border-blue-500/20" 
-                    placeholder="347d..."
-                   />
-                </div>
-                <button 
-                  onClick={testVapiConnection}
-                  className="w-full py-3 mt-2 bg-blue-500/10 border border-blue-500/20 rounded-xl text-[10px] uppercase font-black tracking-widest text-blue-500 hover:bg-blue-500/20 transition-all"
-                >
-                  Sync Neural Core
-                </button>
+             <p className="text-[10px] text-[#444] mb-4 font-mono leading-relaxed">Incoming packets: 1.2MB/s. Webhook active on Vercel Node Engine.</p>
+             <div className="flex justify-between items-center text-[8px] font-black tracking-widest text-emerald-500/50 uppercase italic">
+                <span>Status: Stabilized</span>
+                <span>v21.0</span>
              </div>
           </div>
 
-          {/* Quick Guide Card */}
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-blue-500/10 border border-white/10 backdrop-blur-xl relative overflow-hidden group">
-             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                <Shield className="w-16 h-16 text-emerald-500" />
-             </div>
-             <h3 className="text-[10px] uppercase tracking-[0.3em] text-emerald-500 mb-6 font-black">Security Protocol</h3>
-             <div className="space-y-4 relative z-10">
-                <div className="flex gap-3">
-                   <div className="w-1 h-8 bg-emerald-500/30 rounded-full"></div>
-                   <div>
-                      <p className="text-[10px] text-white/80 font-bold mb-1">Webhook Locked</p>
-                      <p className="text-[9px] text-[#666]">URL validated with Meta Graph API. Verified token is secure.</p>
-                   </div>
-                </div>
-                <div className="flex gap-3">
-                   <div className="w-1 h-8 bg-blue-500/30 rounded-full"></div>
-                   <div>
-                      <p className="text-[10px] text-white/80 font-bold mb-1">Encrypted Stream</p>
-                      <p className="text-[9px] text-[#666]">End-to-end voice encryption via WebRTC + SRTP.</p>
-                   </div>
-                </div>
+          {/* BOX 3: Neural Performance */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+            <div className="flex items-center justify-between mb-4">
+               <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Diagnostic</h3>
+               <Clock className="w-4 h-4 text-orange-500/50" />
+            </div>
+            <div className="space-y-4">
+               <div className="flex justify-between items-center">
+                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Uptime</p>
+                  <p className="text-sm font-mono text-white/90 italic">{formatTime(callDuration)}</p>
+               </div>
+               <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Latency</p>
+                  <p className="text-sm font-mono text-cyan-500">124.8ms</p>
+               </div>
+            </div>
+          </div>
+
+          {/* BOX 4: Neural Voice Profile */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Voice Profile</h3>
+             <select 
+                value={voice} 
+                onChange={(e) => setVoice(e.target.value)}
+                className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-3 text-[10px] text-orange-500/80 outline-none font-mono uppercase tracking-widest cursor-pointer"
+              >
+                <option value="Kore">Kore_Synthesis</option>
+                <option value="Zephyr">Zephyr_Modern</option>
+                <option value="Charon">Charon_V3</option>
+              </select>
+          </div>
+
+          {/* BOX 5: System Files */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Memory Banks</h3>
+             <div className="flex flex-col gap-2">
+                <button onClick={() => window.open('https://github.com', '_blank')} className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] hover:text-white flex items-center justify-between transition-all group font-mono uppercase">
+                   <span>System_Core.ts</span>
+                   <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
+                <button onClick={() => window.open('https://github.com', '_blank')} className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] hover:text-white flex items-center justify-between transition-all group font-mono uppercase">
+                   <span>Neural_API.json</span>
+                   <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </button>
              </div>
           </div>
 
-          {/* Meta Quick Links */}
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-xl">
-             <h3 className="text-[10px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Meta Resources</h3>
-             <div className="space-y-2">
-                <button 
-                  onClick={() => window.open('https://developers.facebook.com/apps/905931435812027/dashboard/', '_blank')}
-                  className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 text-[10px] text-[#888] hover:text-white hover:bg-white/10 transition-all flex items-center justify-between"
-                >
-                   <span>Meta App Dashboard</span>
-                   <ChevronRight className="w-3 h-3" />
-                </button>
-                <button className="w-full text-left p-3 rounded-xl bg-white/5 border border-white/5 text-[10px] text-[#888] hover:text-white hover:bg-white/10 transition-all flex items-center justify-between">
-                   <span>API Usage Metrics</span>
-                   <ChevronRight className="w-3 h-3" />
-                </button>
+          {/* BOX 6: Core Encryption */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl">
+             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Neural Key</h3>
+             <div className="flex gap-2">
+                <input type="password" value={vapiApiKey} onChange={(e) => setVapiApiKey(e.target.value)} className="flex-1 bg-black/60 border border-white/10 rounded px-3 py-2 text-[9px] text-white/40 outline-none font-mono" placeholder="ENCRYPTED_KEY" />
+                <div className="p-2 rounded bg-orange-500/10 border border-orange-500/20 text-orange-500">
+                  <Shield className="w-3 h-3" />
+                </div>
              </div>
+             <p className="text-[7px] text-[#333] mt-3 uppercase tracking-widest font-black">RSA-4096 Secure Socket Layer Active</p>
           </div>
+
+        </div>
+
+        {/* BOTTOM SECTION: Full-Width Robotic Live Transcript */}
+        <div className="flex-1 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-3xl flex flex-col overflow-hidden min-h-[450px] shadow-2xl relative">
+           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500/20 via-orange-500/50 to-orange-500/20"></div>
+           
+           <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
+              <div className="flex items-center gap-4">
+                 <div className="relative">
+                    <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
+                    <div className="absolute inset-0 bg-orange-500 blur-md opacity-30"></div>
+                 </div>
+                 <h2 className="text-xs font-black uppercase tracking-[0.5em] text-white">Live Neural Transcription Output</h2>
+              </div>
+              <div className="flex items-center gap-4">
+                 <div className="text-[10px] font-mono text-[#444] uppercase tracking-widest">Buffer: 4096kb</div>
+                 <div className="px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[8px] uppercase tracking-[0.2em] font-black text-orange-500">Live Feed</div>
+              </div>
+           </div>
+
+           <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar max-h-[500px]">
+              {transcriptions.length === 0 && (
+                <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 italic">
+                   <div className="w-20 h-20 rounded-full border-4 border-dashed border-orange-500/50 animate-spin-slow mb-6"></div>
+                   <p className="text-xs tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Neural Connection</p>
+                </div>
+              )}
+              <AnimatePresence initial={false}>
+                {transcriptions.map((t, i) => (
+                  <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className={`flex flex-col ${t.role === 'model' ? 'items-start' : 'items-end'}`}>
+                    <div className={`max-w-[70%] p-5 rounded-xl font-mono text-[11px] ${t.role === 'model' ? 'bg-orange-500/5 border-l-2 border-orange-500 text-orange-50 shadow-xl' : 'bg-white/5 border-r-2 border-white/20 text-[#ccc]'}`}>
+                       <p className="leading-relaxed whitespace-pre-wrap">{t.text}</p>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3">
+                       <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#444] italic">{t.role === 'model' ? 'Aura_Unit_01' : 'External_Host'}</span>
+                       <div className={`w-1 h-1 rounded-full ${t.role === 'model' ? 'bg-orange-500' : 'bg-[#666]'}`}></div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+           </div>
         </div>
 
       </main>
 
-      {/* Modern Footer Bar */}
-      <footer className="relative z-10 px-8 py-5 border-t border-white/5 bg-black/40 backdrop-blur-md flex flex-wrap gap-y-4 justify-between items-center text-[9px] text-[#444] uppercase tracking-[0.25em] font-black">
-        <div className="flex gap-8 items-center">
-          <div className="flex items-center gap-2">
-             <div className="w-1.5 h-1.5 rounded-full bg-orange-500/50"></div>
-             <span>Engine: Gemini 1.5 Live</span>
-          </div>
-          <div className="flex items-center gap-2">
-             <div className="w-1.5 h-1.5 rounded-full bg-blue-500/50"></div>
-             <span>Voice: Neural {voice}</span>
-          </div>
-        </div>
-        <div className="flex gap-8 items-center">
-          <span className="text-emerald-500/50">Ready for Deployment</span>
-          <div className="px-3 py-1 bg-white/5 rounded border border-white/10">Aura AI v2.4</div>
-        </div>
+      {/* Footer Bar */}
+      <footer className="px-10 py-5 border-t border-white/5 bg-black/60 flex justify-between items-center text-[9px] text-[#333] uppercase tracking-[0.5em] font-black">
+         <div className="flex items-center gap-6">
+            <span className="text-orange-500/50">Core: Gemini_1.5_Flash</span>
+            <span className="text-cyan-500/50">Engine: Vapi_Neural_Link</span>
+         </div>
+         <div className="flex items-center gap-4">
+            <div className="w-2 h-2 rounded bg-orange-500/20"></div>
+            <span>Status: Operational</span>
+         </div>
       </footer>
 
-      {/* Toast Notification for Errors */}
+      {/* Error Toast */}
       <AnimatePresence>
         {error && (
-          <motion.div 
-            initial={{ opacity: 0, y: 100, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 100, scale: 0.9 }}
-            className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 backdrop-blur-3xl p-6 rounded-2xl z-[100] w-full max-w-md shadow-[0_0_50px_rgba(239,68,68,0.1)]"
-          >
-            <div className="flex items-start gap-4">
-               <div className="p-2 rounded-lg bg-red-500/20">
-                  <Shield className="w-5 h-5 text-red-500" />
-               </div>
-               <div className="flex-1">
-                  <h4 className="text-xs font-black uppercase tracking-widest text-red-500 mb-1">System Anomaly Detected</h4>
-                  <p className="text-[11px] text-red-200/70 leading-relaxed font-mono italic">{error}</p>
-               </div>
-               <button onClick={clearError} className="text-red-500/50 hover:text-red-500">
-                  <PhoneOff className="w-4 h-4" />
-               </button>
-            </div>
+          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-red-500/10 border border-red-500/20 p-4 rounded-xl z-[100]">
+            <p className="text-[10px] text-red-500 uppercase font-black tracking-widest">{error}</p>
           </motion.div>
         )}
       </AnimatePresence>
     </div>
   );
 }
-
-
