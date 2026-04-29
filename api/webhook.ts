@@ -16,14 +16,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const token = req.query["hub.verify_token"];
     const challenge = req.query["hub.challenge"];
 
-    const verifyToken = process.env.VITE_WHATSAPP_WEBHOOK_VERIFY_TOKEN || "my_secret_token_123";
+    const verifyToken = (process.env.VITE_WHATSAPP_WEBHOOK_VERIFY_TOKEN || "my_secret_token_123").trim();
 
     if (mode === "subscribe" && token === verifyToken) {
       console.log("Meta Webhook Handshake Successful ✅");
-      res.setHeader('Content-Type', 'text/plain');
-      return res.status(200).end(challenge);
+      return res.status(200).send(challenge);
     } else {
-      console.log("Meta Webhook Handshake Failed ❌ (Token Mismatch)");
+      console.log(`Verification Failed ❌. Expected: ${verifyToken}, Received: ${token}`);
       return res.status(403).send("Forbidden");
     }
   }
