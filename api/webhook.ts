@@ -20,9 +20,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (mode === "subscribe" && token === verifyToken) {
       console.log("Meta Webhook Handshake Successful ✅");
-      // Meta expects a plain text response of the challenge
       res.setHeader('Content-Type', 'text/plain');
-      return res.status(200).send(challenge);
+      return res.status(200).end(challenge);
     } else {
       console.log("Meta Webhook Handshake Failed ❌ (Token Mismatch)");
       return res.status(403).send("Forbidden");
