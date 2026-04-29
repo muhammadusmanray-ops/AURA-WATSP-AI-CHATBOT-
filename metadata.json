@@ -1,0 +1,6 @@
+{
+  "name": "Aura - AI Voice Receptionist",
+  "description": "A real-time AI voice assistant for business and personal use. Features low-latency voice interaction, IVR menus, and seamless AI reception capabilities.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": []
+}
