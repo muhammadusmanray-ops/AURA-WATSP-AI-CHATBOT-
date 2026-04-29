@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
+const genAI = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || "");
 const model = genAI.getGenerativeModel({ 
   model: "gemini-1.5-flash",
   systemInstruction: "You are Aura AI, a super-intelligent and fast assistant. Jawab hamesha Roman Urdu aur English ke mix mein dein. Be concise, smart, and direct. Responses short rakhein taake latency kam ho."

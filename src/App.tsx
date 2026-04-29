@@ -17,7 +17,7 @@ import { useAura } from './hooks/useAura';
 
 export default function App() {
   const { isConnected, transcriptions, error, micVolume, connect, disconnect, clearError } = useAura();
-  const [apiKey, setApiKey] = useState(process.env.GEMINI_API_KEY || '');
+  const [apiKey, setApiKey] = useState(import.meta.env.VITE_GEMINI_API_KEY || '');
   const [vapiApiKey, setVapiApiKey] = useState(import.meta.env.VITE_VAPI_API_KEY || '');
   const [assistantId, setAssistantId] = useState(import.meta.env.VITE_VAPI_ASSISTANT_ID || '');
   const [voice, setVoice] = useState('Kore');
