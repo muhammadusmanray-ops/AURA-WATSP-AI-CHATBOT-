@@ -27,7 +27,7 @@ export default function App() {
   const [logs, setLogs] = useState([
     { id: 1, type: 'system', text: 'Neural Core Initialized...', time: '10:00:01' },
     { id: 2, type: 'whatsapp', text: 'WhatsApp Gateway Online ✅', time: '10:00:05' },
-    { id: 3, type: 'ai', text: 'Aura Protocol v4.0 Active', time: '10:00:10' },
+    { id: 3, type: 'ai', text: 'Aura Protocol v4.5 Active', time: '10:00:10' },
   ]);
 
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col relative">
       {/* Robotic Background Elements */}
       <div className="fixed inset-0 circuit-pattern pointer-events-none"></div>
       <div className="scanline pointer-events-none"></div>
@@ -71,7 +71,7 @@ export default function App() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-black/40 backdrop-blur-md">
+      <nav className="relative z-20 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-black/40 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div className="relative">
             <div className="w-3 h-3 rounded bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,1)] rotate-45"></div>
@@ -79,26 +79,25 @@ export default function App() {
           </div>
           <div>
             <h1 className="text-sm font-black tracking-[0.5em] uppercase text-white">AURA NEURAL CORE</h1>
-            <p className="text-[9px] text-[#555] font-mono uppercase tracking-widest mt-1">Autonomous Robotic Interface v4.2</p>
+            <p className="text-[9px] text-[#555] font-mono uppercase tracking-widest mt-1">Autonomous Robotic Interface v4.5</p>
           </div>
         </div>
         <div className="flex gap-6 items-center">
-            <div className="text-[9px] font-mono text-orange-500/60 uppercase tracking-[0.3em] flex items-center gap-2">
-               <Shield className="w-3 h-3" />
-               SECURE NEURAL LINK
+            <div className="text-[9px] font-mono text-orange-500/60 uppercase tracking-[0.3em] flex items-center gap-2 text-right">
+               <Shield className="w-3 h-3 ml-auto" />
+               SECURE NEURAL LINK ACTIVE
             </div>
-            <div className={`w-1.5 h-6 ${isConnected ? 'bg-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.8)]' : 'bg-white/10'} transition-all`}></div>
         </div>
       </nav>
 
-      <main className="relative z-10 flex-1 p-4 md:p-6 max-w-[1400px] mx-auto w-full space-y-6">
+      <main className="relative z-10 p-4 md:p-6 max-w-[1600px] mx-auto w-full space-y-6">
         
-        {/* 3x3 Robotic Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* 3x3 Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           
           {/* BOX 1: Session Control */}
           <div className="relative group p-[1px] rounded-xl bg-gradient-to-br from-orange-500 via-orange-900 to-black shadow-2xl overflow-hidden">
-             <div className="relative z-10 p-5 rounded-[10px] bg-[#050505]/95 backdrop-blur-3xl h-full flex flex-col justify-between min-h-[160px]">
+             <div className="relative z-10 p-5 rounded-[10px] bg-[#050505]/95 backdrop-blur-3xl h-full flex flex-col justify-between min-h-[180px]">
                 <div className="flex items-center justify-between mb-4 border-b border-orange-500/10 pb-4">
                    <h3 className="text-[9px] uppercase tracking-[0.4em] text-orange-500 font-black italic">Initialize Core</h3>
                    <Zap className="w-4 h-4 text-orange-500" />
@@ -117,44 +116,11 @@ export default function App() {
              </div>
           </div>
 
-          {/* BOX 2: WhatsApp Control */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between min-h-[160px]">
-             <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Meta Bot</h3>
-                <div className={`w-2 h-2 rounded ${botEnabled ? 'bg-emerald-500' : 'bg-red-500'} shadow-lg`}></div>
-             </div>
-             <p className="text-[10px] text-[#444] font-mono mb-4">Autonomous WhatsApp Auto-Pilot: {botEnabled ? 'Active' : 'Disabled'}</p>
-             <button 
-               onClick={() => setBotEnabled(!botEnabled)}
-               className="w-full py-2.5 rounded bg-white/5 border border-white/10 text-[9px] uppercase font-black tracking-widest hover:bg-white/10"
-             >
-               Toggle Bot Logic
-             </button>
-          </div>
-
-          {/* BOX 3: Neural Performance */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[160px]">
-            <div className="flex items-center justify-between mb-4">
-               <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Diagnostic</h3>
-               <Activity className="w-4 h-4 text-orange-500/50" />
-            </div>
-            <div className="space-y-4">
-               <div className="flex justify-between items-center">
-                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Uptime</p>
-                  <p className="text-sm font-mono text-white/90 italic">{formatTime(callDuration)}</p>
-               </div>
-               <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Latency</p>
-                  <p className="text-sm font-mono text-cyan-500">24ms</p>
-               </div>
-            </div>
-          </div>
-
-          {/* BOX 4: Intelligence Feed (Middle Section) */}
-          <div className="md:col-span-2 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl h-[200px] flex flex-col">
+          {/* BOX 2: Intelligence Feed (Middle Large Box) */}
+          <div className="md:col-span-2 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl h-[180px] flex flex-col">
              <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
                 <h3 className="text-[9px] uppercase tracking-[0.3em] text-orange-500 font-black italic">Intelligence Feed</h3>
-                <Terminal className="w-3 h-3 text-[#333]" />
+                <Terminal className="w-3 h-3 text-orange-500/50" />
              </div>
              <div className="flex-1 overflow-y-auto space-y-2 font-mono text-[10px] custom-scrollbar">
                 {logs.map((log) => (
@@ -168,25 +134,88 @@ export default function App() {
              </div>
           </div>
 
-          {/* BOX 5: System Key */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between">
+          {/* BOX 3: Voice Profile (The ones you wanted back) */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[180px]">
+             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Voice Synthesis</h3>
+             <select 
+                value={voice} 
+                onChange={(e) => setVoice(e.target.value)}
+                className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-3 text-[10px] text-orange-500/80 outline-none font-mono uppercase tracking-widest cursor-pointer mb-4"
+              >
+                <option value="Kore">Kore_Synthesis</option>
+                <option value="Zephyr">Zephyr_Modern</option>
+                <option value="Charon">Charon_V3</option>
+              </select>
+              <div className="p-2 rounded bg-orange-500/5 border border-orange-500/10 text-[8px] text-orange-400 font-bold uppercase tracking-widest text-center">
+                 Neural Engine Active
+              </div>
+          </div>
+
+          {/* BOX 4: WhatsApp Bot Control */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between min-h-[160px]">
+             <div className="flex items-center justify-between mb-2">
+                <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Meta Automata</h3>
+                <div className={`w-2 h-2 rounded ${botEnabled ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
+             </div>
+             <p className="text-[10px] text-[#444] font-mono leading-relaxed">Auto-Pilot Status: <span className={botEnabled ? 'text-emerald-500' : 'text-red-500'}>{botEnabled ? 'ENABLED' : 'STALLED'}</span></p>
+             <button 
+               onClick={() => setBotEnabled(!botEnabled)}
+               className="w-full py-2.5 rounded bg-white/5 border border-white/10 text-[9px] uppercase font-black tracking-widest hover:bg-white/10 transition-all"
+             >
+               Toggle Logic
+             </button>
+          </div>
+
+          {/* BOX 5: Diagnostic & Performance */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[160px]">
+            <div className="flex items-center justify-between mb-4">
+               <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Diagnostic</h3>
+               <Activity className="w-4 h-4 text-orange-500/50" />
+            </div>
+            <div className="space-y-4">
+               <div className="flex justify-between items-center">
+                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Core Uptime</p>
+                  <p className="text-xs font-mono text-white/90 italic">{formatTime(callDuration)}</p>
+               </div>
+               <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Sync Latency</p>
+                  <p className="text-xs font-mono text-cyan-500">24.2ms</p>
+               </div>
+            </div>
+          </div>
+
+          {/* BOX 6: Memory Banks (The ones you wanted back) */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[160px]">
+             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Memory Banks</h3>
+             <div className="flex flex-col gap-2">
+                <div className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] flex items-center justify-between font-mono uppercase">
+                   <span>System_Core.ts</span>
+                   <Shield className="w-3 h-3 opacity-20" />
+                </div>
+                <div className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] flex items-center justify-between font-mono uppercase">
+                   <span>Neural_API.json</span>
+                   <Shield className="w-3 h-3 opacity-20" />
+                </div>
+             </div>
+          </div>
+
+          {/* BOX 7: Encryption Key */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between min-h-[160px]">
              <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black mb-4">Neural Key</h3>
              <input 
                type="password" 
                value={apiKey} 
                onChange={(e) => setApiKey(e.target.value)}
-               className="w-full bg-black/60 border border-white/10 rounded px-3 py-2 text-[10px] text-white/40 outline-none font-mono" 
+               className="w-full bg-black/60 border border-white/10 rounded px-3 py-3 text-[10px] text-white/40 outline-none font-mono" 
                placeholder="ENCRYPTED_KEY" 
              />
-             <div className="flex items-center gap-2 mt-4 text-[8px] text-[#333] font-black uppercase tracking-widest">
-                <Shield className="w-3 h-3" /> RSA-4096 ACTIVE
-             </div>
+             <p className="text-[7px] text-[#333] mt-3 uppercase tracking-widest font-black">RSA-4096 Secure Link Active</p>
           </div>
 
         </div>
 
-        {/* Full-Width Robotic Live Transcript (Bottom) */}
-        <div className="flex-1 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-3xl flex flex-col overflow-hidden min-h-[350px] shadow-2xl relative">
+        {/* Bottom Section: Live Neural Output (Bari window) */}
+        <div className="rounded-2xl bg-black/60 border border-white/10 backdrop-blur-3xl flex flex-col overflow-hidden min-h-[400px] shadow-2xl relative">
            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500/20 via-orange-500/50 to-orange-500/20"></div>
            
            <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
@@ -195,18 +224,18 @@ export default function App() {
                     <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
                     <div className="absolute inset-0 bg-orange-500 blur-md opacity-30"></div>
                  </div>
-                 <h2 className="text-xs font-black uppercase tracking-[0.5em] text-white">Live Neural Output</h2>
+                 <h2 className="text-xs font-black uppercase tracking-[0.5em] text-white">Live Neural Output (Voice & Text)</h2>
               </div>
               <div className="flex items-center gap-4">
-                 <div className="px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[8px] uppercase tracking-[0.2em] font-black text-orange-500">Live Stream</div>
+                 <div className="px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[8px] uppercase tracking-[0.2em] font-black text-orange-500">Live Transmission</div>
               </div>
            </div>
 
-           <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+           <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar min-h-[300px]">
               {transcriptions.length === 0 && (
-                <div className="h-full flex flex-col items-center justify-center opacity-10 py-10 italic text-center">
-                   <div className="w-12 h-12 rounded-full border-2 border-dashed border-orange-500/50 animate-spin-slow mb-4 mx-auto"></div>
-                   <p className="text-[10px] tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Connection</p>
+                <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 italic text-center">
+                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-orange-500/50 animate-spin-slow mb-6 mx-auto"></div>
+                   <p className="text-xs tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Connection</p>
                 </div>
               )}
               <AnimatePresence initial={false}>
@@ -216,7 +245,7 @@ export default function App() {
                        <p className="leading-relaxed whitespace-pre-wrap">{t.text}</p>
                     </div>
                     <div className="flex items-center gap-2 mt-3">
-                       <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#444] italic">{t.role === 'model' ? 'Aura_Unit' : 'Host'}</span>
+                       <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#444] italic">{t.role === 'model' ? 'Aura_Core' : 'User_Node'}</span>
                        <div className={`w-1 h-1 rounded-full ${t.role === 'model' ? 'bg-orange-500' : 'bg-[#666]'}`}></div>
                     </div>
                   </motion.div>
@@ -231,7 +260,7 @@ export default function App() {
       <footer className="px-10 py-5 border-t border-white/5 bg-black/60 flex justify-between items-center text-[9px] text-[#333] uppercase tracking-[0.5em] font-black">
          <div className="flex items-center gap-6">
             <span className="text-orange-500/50">Core: Gemini_1.5_Flash</span>
-            <span className="text-cyan-500/50 italic">Robotic v4.2 Stable</span>
+            <span className="text-cyan-500/50 italic tracking-widest">Protocol v4.5 Finalized</span>
          </div>
          <div className="flex items-center gap-4">
             <div className="w-2 h-2 rounded bg-orange-500/20"></div>
@@ -260,13 +289,13 @@ export default function App() {
           to { transform: rotate(360deg); }
         }
         .animate-spin-slow {
-          animation: spin-slow 12s linear infinite;
+          animation: spin-slow 15s linear infinite;
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 2px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(255, 255, 255, 0.02);
+          background: rgba(255, 255, 255, 0.01);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
           background: rgba(249, 115, 22, 0.2);
