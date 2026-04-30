@@ -24,9 +24,18 @@ export default function App() {
   const [botEnabled, setBotEnabled] = useState(true);
   const [voice, setVoice] = useState('Kore');
   const [callDuration, setCallDuration] = useState(0);
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
+  const [isGatewayOpen, setIsGatewayOpen] = useState(false);
+  const [activeChat, setActiveChat] = useState<any>(null);
   const [whatsappMessages, setWhatsappMessages] = useState([
     { id: 1, role: 'user', text: 'Hello, is the doctor available?', time: '10:05 PM', from: '+923001234567' },
     { id: 2, role: 'ai', text: 'Aura here! Dr. Ali is available from 5 PM. Should I book a slot?', time: '10:05 PM' },
+    { id: 3, role: 'user', text: 'Yes, please book for 6 PM.', time: '10:06 PM', from: '+923001234567' },
+  ]);
+  const [chatList, setChatList] = useState([
+    { id: 1, name: 'Rana Rashid', lastMsg: 'Okay', time: '6:29 PM', unread: 1, phone: '+923001234567' },
+    { id: 2, name: '//Hammid', lastMsg: 'Voice call', time: '6:26 PM', unread: 0, phone: '+923123456789' },
+    { id: 3, name: 'Abbas', lastMsg: 'Oi', time: '6:26 PM', unread: 0, phone: '+923214567890' },
   ]);
   const [chatInput, setChatInput] = useState('');
   const [recipientNumber, setRecipientNumber] = useState('');
@@ -79,7 +88,7 @@ export default function App() {
       if (res.ok) {
         setWhatsappMessages(prev => [...prev, { 
           id: Date.now(), 
-          role: 'owner', 
+          role: 'ai', 
           text: chatInput, 
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
         }]);
@@ -92,274 +101,285 @@ export default function App() {
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col relative">
-      {/* Robotic Background Elements */}
-      <div className="fixed inset-0 circuit-pattern pointer-events-none"></div>
-      <div className="scanline pointer-events-none"></div>
-
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-500/10 rounded-full blur-[150px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500/10 rounded-full blur-[150px]"></div>
-      </div>
-
-      {/* Navigation */}
-      <nav className="relative z-20 flex items-center justify-between px-8 py-5 border-b border-white/5 bg-black/40 backdrop-blur-md">
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <div className="w-3 h-3 rounded bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,1)] rotate-45"></div>
-            <div className="absolute inset-0 w-3 h-3 rounded bg-orange-500 animate-ping opacity-40 rotate-45"></div>
-          </div>
-          <div>
-            <h1 className="text-sm font-black tracking-[0.5em] uppercase text-white">AURA NEURAL CORE</h1>
-            <p className="text-[9px] text-[#555] font-mono uppercase tracking-widest mt-1">Autonomous Robotic Interface v4.5</p>
-          </div>
+    <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex relative overflow-hidden">
+      {/* Sidebar Navigation */}
+      <aside className="w-20 border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col items-center py-8 z-50">
+        <div className="w-10 h-10 rounded bg-orange-500 shadow-[0_0_20px_rgba(249,115,22,1)] rotate-45 mb-12 flex items-center justify-center">
+          <div className="rotate-[-45deg] font-black text-black text-xl">A</div>
         </div>
-        <div className="flex gap-6 items-center">
-            <div className="text-[9px] font-mono text-orange-500/60 uppercase tracking-[0.3em] flex items-center gap-2 text-right">
-               <Shield className="w-3 h-3 ml-auto" />
-               SECURE NEURAL LINK ACTIVE
-            </div>
-        </div>
-      </nav>
-
-      <main className="relative z-10 p-4 md:p-6 max-w-[1600px] mx-auto w-full space-y-6">
         
-        {/* 3x3 Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          
-          {/* BOX 1: Session Control */}
-          <div className="relative group p-[1px] rounded-xl bg-gradient-to-br from-orange-500 via-orange-900 to-black shadow-2xl overflow-hidden">
-             <div className="relative z-10 p-5 rounded-[10px] bg-[#050505]/95 backdrop-blur-3xl h-full flex flex-col justify-between min-h-[180px]">
-                <div className="flex items-center justify-between mb-4 border-b border-orange-500/10 pb-4">
-                   <h3 className="text-[9px] uppercase tracking-[0.4em] text-orange-500 font-black italic">Initialize Core</h3>
-                   <Zap className="w-4 h-4 text-orange-500" />
-                </div>
-                <button 
-                  onClick={handleToggleCall}
-                  className={`w-full py-5 rounded-lg text-[11px] uppercase font-black tracking-[0.4em] transition-all active:scale-95 border flex items-center justify-center gap-4 ${
-                    isConnected 
-                      ? 'bg-red-500/10 border-red-500/50 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]' 
-                      : 'bg-orange-500 border-orange-500 text-black hover:shadow-[0_0_30px_rgba(249,115,22,0.6)]'
-                  }`}
-                >
-                  {isConnected ? <PhoneOff className="w-5 h-5" /> : <Phone className="w-5 h-5" />}
-                  <span>{isConnected ? 'Kill Task' : 'Boot Aura'}</span>
-                </button>
-             </div>
-          </div>
+        <div className="flex-1 flex flex-col gap-8">
+          <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={`p-3 rounded-xl transition-all ${activeTab === 'dashboard' ? 'bg-orange-500 text-black shadow-[0_0_20px_rgba(249,115,22,0.4)]' : 'text-[#444] hover:text-orange-500/60'}`}
+          >
+            <Cpu className="w-6 h-6" />
+          </button>
+          <button 
+            onClick={() => setActiveTab('history')}
+            className={`p-3 rounded-xl transition-all ${activeTab === 'history' ? 'bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)]' : 'text-[#444] hover:text-cyan-500/60'}`}
+          >
+            <MessageSquare className="w-6 h-6" />
+          </button>
+          <button 
+            onClick={() => setActiveTab('settings')}
+            className={`p-3 rounded-xl transition-all ${activeTab === 'settings' ? 'bg-white/10 text-white' : 'text-[#444] hover:text-white/60'}`}
+          >
+            <Settings className="w-6 h-6" />
+          </button>
+        </div>
 
-          {/* BOX 2: Intelligence Feed (Middle Large Box) */}
-          <div className="md:col-span-2 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl h-[180px] flex flex-col">
-             <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-                <h3 className="text-[9px] uppercase tracking-[0.3em] text-orange-500 font-black italic">Intelligence Feed</h3>
-                <Terminal className="w-3 h-3 text-orange-500/50" />
-             </div>
-             <div className="flex-1 overflow-y-auto space-y-2 font-mono text-[10px] custom-scrollbar">
-                {logs.map((log) => (
-                  <div key={log.id} className="flex gap-4">
-                    <span className="text-[#333]">[{log.time}]</span>
-                    <span className={`uppercase font-black ${log.type === 'ai' ? 'text-orange-500' : 'text-[#666]'}`}>{log.type}</span>
-                    <span className="text-[#888]">{log.text}</span>
-                  </div>
-                ))}
-                <div ref={logsEndRef} />
-             </div>
+        <div className="mt-auto">
+          <div className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+            <User className="w-5 h-5 text-[#666]" />
           </div>
+        </div>
+      </aside>
 
-          {/* BOX 3: Voice Profile (The ones you wanted back) */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[180px]">
-             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Voice Synthesis</h3>
-             <select 
-                value={voice} 
-                onChange={(e) => setVoice(e.target.value)}
-                className="w-full bg-black/60 border border-white/10 rounded-lg px-3 py-3 text-[10px] text-orange-500/80 outline-none font-mono uppercase tracking-widest cursor-pointer mb-4"
+      <div className="flex-1 flex flex-col relative overflow-hidden">
+        {/* Robotic Background Elements */}
+        <div className="fixed inset-0 circuit-pattern pointer-events-none"></div>
+        <div className="scanline pointer-events-none"></div>
+
+        {/* Tab Content */}
+        <div className="flex-1 overflow-y-auto custom-scrollbar relative z-10">
+          <AnimatePresence mode="wait">
+            {activeTab === 'dashboard' && (
+              <motion.div 
+                key="dashboard"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="p-8 max-w-[1600px] mx-auto w-full space-y-8"
               >
-                <option value="Kore">Kore_Synthesis</option>
-                <option value="Zephyr">Zephyr_Modern</option>
-                <option value="Charon">Charon_V3</option>
-              </select>
-              <div className="p-2 rounded bg-orange-500/5 border border-orange-500/10 text-[8px] text-orange-400 font-bold uppercase tracking-widest text-center">
-                 Neural Engine Active
-              </div>
-          </div>
-
-          {/* BOX 4: WhatsApp Bot Control */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between min-h-[160px]">
-             <div className="flex items-center justify-between mb-2">
-                <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Meta Automata</h3>
-                <div className={`w-2 h-2 rounded ${botEnabled ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
-             </div>
-             <p className="text-[10px] text-[#444] font-mono leading-relaxed">Auto-Pilot Status: <span className={botEnabled ? 'text-emerald-500' : 'text-red-500'}>{botEnabled ? 'ENABLED' : 'STALLED'}</span></p>
-             <button 
-               onClick={() => setBotEnabled(!botEnabled)}
-               className="w-full py-2.5 rounded bg-white/5 border border-white/10 text-[9px] uppercase font-black tracking-widest hover:bg-white/10 transition-all"
-             >
-               Toggle Logic
-             </button>
-          </div>
-
-          {/* BOX 5: Diagnostic & Performance */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[160px]">
-            <div className="flex items-center justify-between mb-4">
-               <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black">Diagnostic</h3>
-               <Activity className="w-4 h-4 text-orange-500/50" />
-            </div>
-            <div className="space-y-4">
-               <div className="flex justify-between items-center">
-                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Core Uptime</p>
-                  <p className="text-xs font-mono text-white/90 italic">{formatTime(callDuration)}</p>
-               </div>
-               <div className="flex justify-between items-center pt-2 border-t border-white/5">
-                  <p className="text-[8px] uppercase text-[#333] font-bold tracking-tighter">Sync Latency</p>
-                  <p className="text-xs font-mono text-cyan-500">24.2ms</p>
-               </div>
-            </div>
-          </div>
-
-          {/* BOX 7: WhatsApp Live Monitor */}
-          <div className="md:col-span-2 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col min-h-[300px]">
-             <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
-                <h3 className="text-[9px] uppercase tracking-[0.3em] text-cyan-500 font-black italic">WhatsApp Live Gateway</h3>
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
-                  <span className="text-[8px] text-cyan-500/50 font-mono">ENCRYPTED_TUNNEL</span>
-                </div>
-             </div>
-             
-             {/* Chat History */}
-             <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2 custom-scrollbar max-h-[180px]">
-                {whatsappMessages.map((msg) => (
-                  <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}>
-                    <div className={`px-3 py-2 rounded-lg text-[10px] max-w-[85%] ${
-                      msg.role === 'user' ? 'bg-white/5 border border-white/10 text-white' : 
-                      msg.role === 'ai' ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' :
-                      'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400'
-                    }`}>
-                      {msg.from && <p className="text-[7px] opacity-40 mb-1">{msg.from}</p>}
-                      <p>{msg.text}</p>
-                    </div>
-                    <span className="text-[7px] text-[#444] mt-1 uppercase">{msg.time} • {msg.role}</span>
+                <div className="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
+                  <div>
+                    <h1 className="text-xl font-black tracking-[0.5em] uppercase text-white">NEURAL CORE DASHBOARD</h1>
+                    <p className="text-[10px] text-[#555] font-mono uppercase tracking-widest mt-1">Status: Operational // Link: Secure</p>
                   </div>
-                ))}
-             </div>
-
-             {/* Input Area */}
-             <div className="space-y-2 mt-auto">
-                <input 
-                  type="text" 
-                  placeholder="RECIPIENT_NUMBER (+92...)" 
-                  value={recipientNumber}
-                  onChange={(e) => setRecipientNumber(e.target.value)}
-                  className="w-full bg-black/40 border border-white/5 rounded px-3 py-2 text-[9px] text-cyan-500/70 outline-none font-mono"
-                />
-                <div className="flex gap-2">
-                  <input 
-                    type="text" 
-                    placeholder="TYPE_NEURAL_OVERRIDE_MESSAGE..." 
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSendWhatsApp()}
-                    className="flex-1 bg-black/40 border border-white/5 rounded px-3 py-2 text-[10px] text-white outline-none"
-                  />
-                  <button 
-                    onClick={handleSendWhatsApp}
-                    disabled={isSending}
-                    className="px-4 py-2 bg-cyan-500/20 border border-cyan-500/40 text-cyan-500 rounded text-[9px] font-black uppercase hover:bg-cyan-500 hover:text-black transition-all"
-                  >
-                    {isSending ? '...' : 'Send'}
-                  </button>
+                  <div className="px-4 py-2 rounded bg-orange-500/5 border border-orange-500/20 text-[10px] text-orange-500 font-black uppercase tracking-widest animate-pulse">
+                    Core Live
+                  </div>
                 </div>
-             </div>
-          </div>
 
-          {/* BOX 8: Neural Key (Moved/Adjusted) */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between">
-             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black mb-4">Neural Key</h3>
-             <input 
-               type="password" 
-               value={apiKey} 
-               onChange={(e) => setApiKey(e.target.value)}
-               className="w-full bg-black/60 border border-white/10 rounded px-3 py-3 text-[10px] text-white/40 outline-none font-mono" 
-               placeholder="ENCRYPTED_KEY" 
-             />
-             <p className="text-[7px] text-[#333] mt-3 uppercase tracking-widest font-black">RSA-4096 Secure Link Active</p>
-          </div>
-
-
-        </div>
-
-        {/* Bottom Section: Live Neural Output (Bari window) */}
-        <div className="rounded-2xl bg-black/60 border border-white/10 backdrop-blur-3xl flex flex-col overflow-hidden min-h-[400px] shadow-2xl relative">
-           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-500/20 via-orange-500/50 to-orange-500/20"></div>
-           
-           <div className="px-6 py-5 border-b border-white/5 flex items-center justify-between bg-white/[0.02]">
-              <div className="flex items-center gap-4">
-                 <div className="relative">
-                    <div className="w-3 h-3 rounded-full bg-orange-500 animate-pulse"></div>
-                    <div className="absolute inset-0 bg-orange-500 blur-md opacity-30"></div>
-                 </div>
-                 <h2 className="text-xs font-black uppercase tracking-[0.5em] text-white">Live Neural Output (Voice & Text)</h2>
-              </div>
-              <div className="flex items-center gap-4">
-                 <div className="px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-[8px] uppercase tracking-[0.2em] font-black text-orange-500">Live Transmission</div>
-              </div>
-           </div>
-
-           <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar min-h-[300px]">
-              {transcriptions.length === 0 && !isConnected && (
-                <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 italic text-center">
-                   <div className="w-16 h-16 rounded-full border-2 border-dashed border-orange-500/50 animate-spin-slow mb-6 mx-auto"></div>
-                   <p className="text-xs tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Connection</p>
-                </div>
-              )}
-
-              {/* Voice Pulse Visualizer */}
-              {isConnected && (
-                <div className="flex items-center justify-center gap-1.5 h-32 mb-10">
-                  {[...Array(20)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{ 
-                        height: isConnected ? `${Math.max(4, micVolume * 400 * (1 - Math.abs(i - 10) / 10))}px` : '4px',
-                        opacity: isConnected ? 0.8 : 0.2
-                      }}
-                      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      className="w-1.5 bg-orange-500 rounded-full shadow-[0_0_15px_rgba(249,115,22,0.5)]"
-                    />
-                  ))}
-                </div>
-              )}
-              <AnimatePresence initial={false}>
-                {transcriptions.map((t, i) => (
-                  <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className={`flex flex-col ${t.role === 'model' ? 'items-start' : 'items-end'}`}>
-                    <div className={`max-w-[70%] p-5 rounded-xl font-mono text-[11px] ${t.role === 'model' ? 'bg-orange-500/5 border-l-2 border-orange-500 text-orange-50 shadow-xl' : 'bg-white/5 border-r-2 border-white/20 text-[#ccc]'}`}>
-                       <p className="leading-relaxed whitespace-pre-wrap">{t.text}</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {/* BOX 1: Session Control */}
+                  <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[200px] flex flex-col justify-between">
+                    <div className="flex justify-between items-start">
+                      <h3 className="text-[10px] uppercase font-black text-orange-500 tracking-widest italic">Core Protocol</h3>
+                      <Zap className="w-4 h-4 text-orange-500" />
                     </div>
-                    <div className="flex items-center gap-2 mt-3">
-                       <span className="text-[8px] font-black uppercase tracking-[0.3em] text-[#444] italic">{t.role === 'model' ? 'Aura_Core' : 'User_Node'}</span>
-                       <div className={`w-1 h-1 rounded-full ${t.role === 'model' ? 'bg-orange-500' : 'bg-[#666]'}`}></div>
+                    <button 
+                      onClick={handleToggleCall}
+                      className={`w-full py-5 rounded-lg text-[11px] font-black uppercase tracking-widest transition-all ${
+                        isConnected ? 'bg-red-500/10 border border-red-500/50 text-red-500 shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 'bg-orange-500 text-black shadow-lg shadow-orange-500/20'
+                      }`}
+                    >
+                      {isConnected ? 'Kill Session' : 'Boot Aura'}
+                    </button>
+                  </div>
+
+                  {/* Intelligence Feed */}
+                  <div className="md:col-span-2 p-6 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl h-[200px] flex flex-col overflow-hidden">
+                    <h3 className="text-[10px] uppercase font-black text-[#666] tracking-widest mb-4 italic">Neural Logs</h3>
+                    <div className="flex-1 overflow-y-auto space-y-2 font-mono text-[10px] text-[#888] custom-scrollbar">
+                      {logs.map(log => (
+                        <div key={log.id} className="flex gap-4">
+                          <span className="opacity-30">[{log.time}]</span>
+                          <span className={`font-black uppercase ${log.type === 'ai' ? 'text-orange-500' : 'text-[#444]'}`}>{log.type}</span>
+                          <span>{log.text}</span>
+                        </div>
+                      ))}
                     </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-           </div>
+                  </div>
+
+                  {/* Voice Synthesis */}
+                  <div className="p-6 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[200px]">
+                    <h3 className="text-[10px] uppercase font-black text-[#666] tracking-widest mb-4">Synthesis</h3>
+                    <select 
+                      value={voice} 
+                      onChange={(e) => setVoice(e.target.value)}
+                      className="w-full bg-black/40 border border-white/10 rounded px-3 py-3 text-[10px] text-orange-500/80 outline-none font-mono uppercase tracking-widest cursor-pointer"
+                    >
+                      <option value="Kore">Kore_Synthesis</option>
+                      <option value="Zephyr">Zephyr_Modern</option>
+                      <option value="Charon">Charon_V3</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Big Live Intelligence Stream */}
+                <div className="rounded-2xl bg-black/60 border border-white/10 backdrop-blur-3xl overflow-hidden shadow-2xl relative min-h-[500px] flex flex-col">
+                  <div className="px-8 py-6 border-b border-white/5 flex items-center justify-between">
+                    <h2 className="text-xs font-black uppercase tracking-[0.5em] text-white italic">Live Intelligence Stream</h2>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-orange-500 animate-ping' : 'bg-[#333]'}`}></div>
+                      <span className="text-[9px] uppercase font-black text-[#666]">Neural Connection Status</span>
+                    </div>
+                  </div>
+                  <div className="flex-1 p-10 overflow-y-auto space-y-8 custom-scrollbar">
+                    {transcriptions.length === 0 && !isConnected && (
+                      <div className="h-full flex flex-col items-center justify-center opacity-10 py-20 italic text-center">
+                        <div className="w-16 h-16 rounded-full border-2 border-dashed border-orange-500/50 animate-spin-slow mb-6 mx-auto"></div>
+                        <p className="text-xs tracking-[0.5em] uppercase font-black text-orange-500">Awaiting Connection</p>
+                      </div>
+                    )}
+                    {transcriptions.map((t, i) => (
+                      <div key={i} className={`flex flex-col ${t.role === 'model' ? 'items-start' : 'items-end'}`}>
+                        <div className={`max-w-[75%] p-6 rounded-2xl font-mono text-xs ${
+                          t.role === 'model' ? 'bg-orange-500/5 border-l-4 border-orange-500 text-orange-50 shadow-2xl' : 'bg-white/5 border-r-4 border-white/20 text-[#ccc]'
+                        }`}>
+                          {t.text}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'history' && (
+              <motion.div 
+                key="history"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex h-full bg-[#0b141a]"
+              >
+                {/* WhatsApp UI Sidebar */}
+                <div className="w-[400px] border-r border-white/5 bg-[#111b21] flex flex-col shadow-2xl">
+                   <div className="p-6 bg-[#202c33] flex items-center justify-between">
+                      <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#e9edef]">Neural Archive</h2>
+                      <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
+                        <Clock className="w-4 h-4 text-[#8696a0]" />
+                      </div>
+                   </div>
+                   <div className="p-4">
+                      <input type="text" placeholder="Search Encrypted History" className="w-full bg-[#202c33] rounded-xl px-4 py-3 text-xs text-[#d1d7db] outline-none border border-white/5" />
+                   </div>
+                   <div className="flex-1 overflow-y-auto custom-scrollbar">
+                      {chatList.map(chat => (
+                        <div 
+                          key={chat.id} 
+                          onClick={() => {
+                            setActiveChat(chat);
+                            setRecipientNumber(chat.phone);
+                          }}
+                          className={`p-6 flex gap-4 cursor-pointer hover:bg-[#2a3942] transition-all border-b border-white/5 ${activeChat?.id === chat.id ? 'bg-[#2a3942]' : ''}`}
+                        >
+                           <div className="w-14 h-14 rounded-full bg-[#333] flex items-center justify-center font-bold text-white text-xl uppercase shadow-lg border-2 border-white/5">{chat.name[0]}</div>
+                           <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-center mb-1">
+                                 <p className="text-sm font-bold text-[#e9edef] truncate">{chat.name}</p>
+                                 <span className="text-[10px] text-[#8696a0] font-mono">{chat.time}</span>
+                              </div>
+                              <p className="text-xs text-[#8696a0] truncate italic opacity-60">{chat.lastMsg}</p>
+                           </div>
+                        </div>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Main Chat Window */}
+                <div className="flex-1 flex flex-col bg-[#0b141a] relative">
+                  {activeChat ? (
+                    <>
+                      <div className="p-5 bg-[#202c33] flex items-center gap-4 border-l border-white/5 shadow-md z-10">
+                         <div className="w-12 h-12 rounded-full bg-[#333] flex items-center justify-center font-bold text-white uppercase border-2 border-white/5 shadow-inner">{activeChat.name[0]}</div>
+                         <div>
+                            <h3 className="text-sm font-bold text-[#e9edef]">{activeChat.name}</h3>
+                            <div className="flex items-center gap-2">
+                               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                               <p className="text-[9px] text-emerald-500/80 uppercase tracking-widest font-black">AI Auto-Pilot Active</p>
+                            </div>
+                         </div>
+                      </div>
+                      <div className="flex-1 p-10 overflow-y-auto space-y-6 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat opacity-80 custom-scrollbar">
+                         {whatsappMessages.map(msg => (
+                            <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}>
+                               <div className={`max-w-[65%] p-5 rounded-2xl shadow-2xl relative ${msg.role === 'user' ? 'bg-[#202c33] text-[#e9edef] rounded-tl-none border-l-2 border-white/10' : 'bg-[#005c4b] text-[#e9edef] rounded-tr-none border-r-2 border-emerald-400/30'}`}>
+                                  <p className="text-sm leading-relaxed">{msg.text}</p>
+                                  <div className="flex justify-end items-center gap-2 mt-3 opacity-40">
+                                     <span className="text-[9px] font-mono uppercase">{msg.time}</span>
+                                     {msg.role !== 'user' && <Zap className="w-2 h-2 text-cyan-400" />}
+                                  </div>
+                               </div>
+                            </div>
+                         ))}
+                      </div>
+                      <div className="p-6 bg-[#202c33] flex gap-4 items-center border-t border-white/5">
+                         <input 
+                           type="text" 
+                           placeholder="Enter Neural Override command..." 
+                           value={chatInput}
+                           onChange={(e) => setChatInput(e.target.value)}
+                           onKeyDown={(e) => e.key === 'Enter' && handleSendWhatsApp()}
+                           className="flex-1 bg-[#2a3942] rounded-2xl px-8 py-5 text-sm text-[#d1d7db] outline-none border border-white/5 focus:border-cyan-500/30 transition-all" 
+                         />
+                         <button onClick={handleSendWhatsApp} className="p-5 bg-[#00a884] rounded-full text-black hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20">
+                            <Zap className="w-6 h-6 fill-current" />
+                         </button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center opacity-10 grayscale p-20 text-center">
+                       <div className="w-32 h-32 rounded-full border-4 border-dashed border-white/20 animate-spin-slow mb-12"></div>
+                       <h3 className="text-xl font-black uppercase tracking-[1em] text-white">Neural Archive</h3>
+                       <p className="text-xs uppercase tracking-[0.5em] mt-4">Select an established link to view historical data</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === 'settings' && (
+              <motion.div 
+                key="settings"
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                className="p-20 max-w-4xl mx-auto w-full space-y-12"
+              >
+                <div className="flex items-center gap-6 mb-10">
+                   <div className="w-12 h-12 rounded bg-white/5 flex items-center justify-center">
+                      <Settings className="w-6 h-6 text-[#444]" />
+                   </div>
+                   <h1 className="text-3xl font-black uppercase tracking-[0.4em] text-white">Core Configuration</h1>
+                </div>
+
+                <div className="space-y-10">
+                   <div className="bg-white/[0.02] p-10 rounded-3xl border border-white/10 backdrop-blur-3xl shadow-2xl">
+                      <p className="text-[10px] text-orange-500 font-black uppercase tracking-[0.5em] mb-6 italic">Neural API Encryption</p>
+                      <input 
+                        type="password" 
+                        value={apiKey} 
+                        onChange={(e) => setApiKey(e.target.value)}
+                        className="w-full bg-black/60 border border-white/10 rounded-2xl px-8 py-6 text-sm text-white/50 outline-none font-mono focus:border-orange-500/50 transition-all" 
+                        placeholder="ENCRYPTED_KEY_STREAM" 
+                      />
+                      <div className="mt-8 flex items-center gap-4 text-[9px] text-[#555] font-bold uppercase tracking-widest">
+                         <Shield className="w-4 h-4 text-emerald-500" />
+                         Encryption Mode: AES-256-GCM Secure
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-6">
+                      <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/5">
+                         <p className="text-[10px] text-[#444] font-black uppercase tracking-widest mb-4">Storage Node</p>
+                         <p className="text-xs font-mono text-emerald-500">NEON_DB_PROD_01</p>
+                      </div>
+                      <div className="p-8 rounded-2xl bg-white/[0.02] border border-white/5">
+                         <p className="text-[10px] text-[#444] font-black uppercase tracking-widest mb-4">Voice Engine</p>
+                         <p className="text-xs font-mono text-cyan-500">GEMINI_LIVE_SYNTH</p>
+                      </div>
+                   </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-
-      </main>
-
-      {/* Footer Bar */}
-      <footer className="px-10 py-5 border-t border-white/5 bg-black/60 flex justify-between items-center text-[9px] text-[#333] uppercase tracking-[0.5em] font-black">
-         <div className="flex items-center gap-6">
-            <span className="text-orange-500/50">Core: Gemini_1.5_Flash</span>
-            <span className="text-cyan-500/50 italic tracking-widest">Protocol v4.5 Finalized</span>
-         </div>
-         <div className="flex items-center gap-4">
-            <div className="w-2 h-2 rounded bg-orange-500/20"></div>
-            <span>Status: Operational</span>
-         </div>
-      </footer>
+      </div>
 
       <style>{`
         .circuit-pattern {
@@ -385,14 +405,17 @@ export default function App() {
           animation: spin-slow 15s linear infinite;
         }
         .custom-scrollbar::-webkit-scrollbar {
-          width: 2px;
+          width: 4px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.01);
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: rgba(249, 115, 22, 0.2);
+          background: rgba(249, 115, 22, 0.1);
           border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: rgba(249, 115, 22, 0.3);
         }
       `}</style>
     </div>
