@@ -24,6 +24,14 @@ export default function App() {
   const [botEnabled, setBotEnabled] = useState(true);
   const [voice, setVoice] = useState('Kore');
   const [callDuration, setCallDuration] = useState(0);
+  const [whatsappMessages, setWhatsappMessages] = useState([
+    { id: 1, role: 'user', text: 'Hello, is the doctor available?', time: '10:05 PM', from: '+923001234567' },
+    { id: 2, role: 'ai', text: 'Aura here! Dr. Ali is available from 5 PM. Should I book a slot?', time: '10:05 PM' },
+  ]);
+  const [chatInput, setChatInput] = useState('');
+  const [recipientNumber, setRecipientNumber] = useState('');
+  const [isSending, setIsSending] = useState(false);
+
   const [logs, setLogs] = useState([
     { id: 1, type: 'system', text: 'Neural Core Initialized...', time: '10:00:01' },
     { id: 2, type: 'whatsapp', text: 'WhatsApp Gateway Online ✅', time: '10:00:05' },
@@ -58,6 +66,32 @@ export default function App() {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  const handleSendWhatsApp = async () => {
+    if (!chatInput || !recipientNumber) return;
+    setIsSending(true);
+    try {
+      const res = await fetch('/api/send-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ to: recipientNumber, text: chatInput })
+      });
+      if (res.ok) {
+        setWhatsappMessages(prev => [...prev, { 
+          id: Date.now(), 
+          role: 'owner', 
+          text: chatInput, 
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+        }]);
+        setChatInput('');
+      }
+    } catch (err) {
+      console.error("Failed to send message", err);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-[#020202] text-[#e0e0e0] font-sans selection:bg-orange-500/30 flex flex-col relative">
@@ -184,23 +218,64 @@ export default function App() {
             </div>
           </div>
 
-          {/* BOX 6: Memory Banks (The ones you wanted back) */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl min-h-[160px]">
-             <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] mb-4 font-black">Memory Banks</h3>
-             <div className="flex flex-col gap-2">
-                <div className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] flex items-center justify-between font-mono uppercase">
-                   <span>System_Core.ts</span>
-                   <Shield className="w-3 h-3 opacity-20" />
+          {/* BOX 7: WhatsApp Live Monitor */}
+          <div className="md:col-span-2 p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col min-h-[300px]">
+             <div className="flex items-center justify-between mb-4 border-b border-white/5 pb-2">
+                <h3 className="text-[9px] uppercase tracking-[0.3em] text-cyan-500 font-black italic">WhatsApp Live Gateway</h3>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
+                  <span className="text-[8px] text-cyan-500/50 font-mono">ENCRYPTED_TUNNEL</span>
                 </div>
-                <div className="w-full p-2.5 rounded bg-white/5 border border-white/5 text-[9px] text-[#888] flex items-center justify-between font-mono uppercase">
-                   <span>Neural_API.json</span>
-                   <Shield className="w-3 h-3 opacity-20" />
+             </div>
+             
+             {/* Chat History */}
+             <div className="flex-1 overflow-y-auto space-y-3 mb-4 pr-2 custom-scrollbar max-h-[180px]">
+                {whatsappMessages.map((msg) => (
+                  <div key={msg.id} className={`flex flex-col ${msg.role === 'user' ? 'items-start' : 'items-end'}`}>
+                    <div className={`px-3 py-2 rounded-lg text-[10px] max-w-[85%] ${
+                      msg.role === 'user' ? 'bg-white/5 border border-white/10 text-white' : 
+                      msg.role === 'ai' ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' :
+                      'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400'
+                    }`}>
+                      {msg.from && <p className="text-[7px] opacity-40 mb-1">{msg.from}</p>}
+                      <p>{msg.text}</p>
+                    </div>
+                    <span className="text-[7px] text-[#444] mt-1 uppercase">{msg.time} • {msg.role}</span>
+                  </div>
+                ))}
+             </div>
+
+             {/* Input Area */}
+             <div className="space-y-2 mt-auto">
+                <input 
+                  type="text" 
+                  placeholder="RECIPIENT_NUMBER (+92...)" 
+                  value={recipientNumber}
+                  onChange={(e) => setRecipientNumber(e.target.value)}
+                  className="w-full bg-black/40 border border-white/5 rounded px-3 py-2 text-[9px] text-cyan-500/70 outline-none font-mono"
+                />
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    placeholder="TYPE_NEURAL_OVERRIDE_MESSAGE..." 
+                    value={chatInput}
+                    onChange={(e) => setChatInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendWhatsApp()}
+                    className="flex-1 bg-black/40 border border-white/5 rounded px-3 py-2 text-[10px] text-white outline-none"
+                  />
+                  <button 
+                    onClick={handleSendWhatsApp}
+                    disabled={isSending}
+                    className="px-4 py-2 bg-cyan-500/20 border border-cyan-500/40 text-cyan-500 rounded text-[9px] font-black uppercase hover:bg-cyan-500 hover:text-black transition-all"
+                  >
+                    {isSending ? '...' : 'Send'}
+                  </button>
                 </div>
              </div>
           </div>
 
-          {/* BOX 7: Encryption Key */}
-          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between min-h-[160px]">
+          {/* BOX 8: Neural Key (Moved/Adjusted) */}
+          <div className="p-5 rounded-xl bg-white/[0.02] border border-white/5 backdrop-blur-xl flex flex-col justify-between">
              <h3 className="text-[9px] uppercase tracking-[0.3em] text-[#666] font-black mb-4">Neural Key</h3>
              <input 
                type="password" 
@@ -211,6 +286,7 @@ export default function App() {
              />
              <p className="text-[7px] text-[#333] mt-3 uppercase tracking-widest font-black">RSA-4096 Secure Link Active</p>
           </div>
+
 
         </div>
 
