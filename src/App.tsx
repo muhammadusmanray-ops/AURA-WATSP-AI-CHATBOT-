@@ -25,6 +25,14 @@ export default function App() {
   const [voice, setVoice] = useState('Kore');
   const [callDuration, setCallDuration] = useState(0);
   const [activeTab, setActiveTab] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab') as any;
+    if (tab && ['dashboard', 'history', 'settings'].includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
   const [isGatewayOpen, setIsGatewayOpen] = useState(false);
   const [activeChat, setActiveChat] = useState<any>(null);
   const [whatsappMessages, setWhatsappMessages] = useState([
@@ -43,7 +51,7 @@ export default function App() {
 
   const [logs, setLogs] = useState([
     { id: 1, type: 'system', text: 'Neural Core Initialized...', time: '10:00:01' },
-    { id: 2, type: 'whatsapp', text: 'WhatsApp Gateway Online ✅', time: '10:00:05' },
+    { id: 2, type: 'telegram', text: 'Telegram Gateway Online ✅', time: '10:00:05' },
     { id: 3, type: 'ai', text: 'Aura Protocol v4.5 Active', time: '10:00:10' },
   ]);
 
@@ -250,7 +258,7 @@ export default function App() {
                 {/* WhatsApp UI Sidebar */}
                 <div className="w-[400px] border-r border-white/5 bg-[#111b21] flex flex-col shadow-2xl">
                    <div className="p-6 bg-[#202c33] flex items-center justify-between">
-                      <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#e9edef]">Neural Archive</h2>
+                      <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[#e9edef]">Chat Archive</h2>
                       <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center">
                         <Clock className="w-4 h-4 text-[#8696a0]" />
                       </div>
@@ -298,7 +306,7 @@ export default function App() {
                       <div className="flex-1 p-10 overflow-y-auto space-y-6 bg-[url('https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png')] bg-repeat opacity-80 custom-scrollbar">
                          {whatsappMessages.map(msg => (
                             <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}>
-                               <div className={`max-w-[65%] p-5 rounded-2xl shadow-2xl relative ${msg.role === 'user' ? 'bg-[#202c33] text-[#e9edef] rounded-tl-none border-l-2 border-white/10' : 'bg-[#005c4b] text-[#e9edef] rounded-tr-none border-r-2 border-emerald-400/30'}`}>
+                               <div className={`max-w-[65%] p-5 rounded-2xl shadow-2xl relative ${msg.role === 'user' ? 'bg-[#202c33] text-[#e9edef] rounded-tl-none border-l-2 border-white/10' : 'bg-orange-500/20 text-[#e9edef] rounded-tr-none border-r-2 border-orange-400/30'}`}>
                                   <p className="text-sm leading-relaxed">{msg.text}</p>
                                   <div className="flex justify-end items-center gap-2 mt-3 opacity-40">
                                      <span className="text-[9px] font-mono uppercase">{msg.time}</span>
@@ -317,9 +325,9 @@ export default function App() {
                            onKeyDown={(e) => e.key === 'Enter' && handleSendWhatsApp()}
                            className="flex-1 bg-[#2a3942] rounded-2xl px-8 py-5 text-sm text-[#d1d7db] outline-none border border-white/5 focus:border-cyan-500/30 transition-all" 
                          />
-                         <button onClick={handleSendWhatsApp} className="p-5 bg-[#00a884] rounded-full text-black hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20">
+                          <button onClick={handleSendWhatsApp} className="p-5 bg-orange-500 rounded-full text-black hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-orange-500/20">
                             <Zap className="w-6 h-6 fill-current" />
-                         </button>
+                          </button>
                       </div>
                     </>
                   ) : (
